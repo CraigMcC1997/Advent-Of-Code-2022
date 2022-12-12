@@ -6,33 +6,79 @@
 
 using namespace std;
 
-// !!fix the globals!!
-int highestCalorieCount = 0;
-int secondHighestCalorieCount = 0;
-int thirdHighestCalorieCount = 0;
+enum result {
+	Rock,
+	Paper,
+	Scissors
+};
 
-// check which place the value should go
-void updateTop3(int value)
+enum roundScore {
+	rock = 1,
+	paper = 2,
+	scissors = 3,
+
+	Loss = 0,
+	Draw = 3,
+	Win = 6
+};
+
+int checkResult(char opponent, char player)
 {
-	if (value > highestCalorieCount)
-		highestCalorieCount = value;
-	else if (value > secondHighestCalorieCount)
-		secondHighestCalorieCount = value;
+	//convert to readable result
+	int opponentResult{};
+	int playerResult{};
+	int matchResult{};
+
+	switch (opponent)
+	{
+	case 'A':
+		opponentResult = Rock;
+		break;
+	case 'B':
+		opponentResult = Paper;
+		break;
+	case 'C':
+		opponentResult = Scissors;
+		break;
+	}
+
+	switch (player)
+	{
+	case 'X':
+		playerResult = Rock;
+		break;
+	case 'Y':
+		playerResult = Paper;
+		break;
+	case 'Z':
+		playerResult = Scissors;
+		break;
+	}
+
+	//compare
+	if (playerResult == opponentResult)
+		matchResult = (playerResult + 1) + Draw;
+	else if (playerResult == Rock && opponentResult == Scissors)
+		matchResult = rock + Win;
+	else if (playerResult == Paper && opponentResult == Rock)
+		matchResult = paper + Win;
+	else if (playerResult == Scissors && opponentResult == Paper)
+		matchResult = scissors + Win;
 	else
-		thirdHighestCalorieCount = value;
+		matchResult = (playerResult + 1) + Loss;
+
+	return matchResult;
 }
 
 int main()
 {
 	ifstream input("../input.txt");
 	string line;
-	int current = 0;
-	int elfCount = 234;
-	int elves[234];
-	int i = 0;
+	int totalScore = 0;
 
 	// Check if the file was successfully opened
-	if (!input.is_open()) {
+	if (!input.is_open())
+	{
 		cerr << "Failed to open input file!" << endl;
 		return 1;
 	}
@@ -40,25 +86,10 @@ int main()
 	// Read each line of the file
 	while (getline(input, line))
 	{
-		// until a new line is found, add to current value
-		if (!line.empty())
-		{
-			// Convert the line to an integer and add to total
-			int value = atoi(line.c_str());
-			current += value;
-		}
-		else
-		{
-			elves[i] = current;
-			i++;
-			current = 0;
-		}
+		totalScore += checkResult(line[0], line[2]);
 	}
 
-	sort(elves, elves + elfCount);
-
-	int total = (elves[elfCount - 1] + elves[elfCount - 2] + elves[elfCount - 3]);
-	cout << "total: " << total << endl;
+	cout << "Score: " << totalScore << endl;
 
 	// Close the file
 	input.close();
