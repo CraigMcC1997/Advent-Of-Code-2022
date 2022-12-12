@@ -6,10 +6,16 @@
 
 using namespace std;
 
-enum result {
+enum opponentHand {
 	Rock,
 	Paper,
 	Scissors
+};
+
+enum gameResult {
+	Win,
+	Loss,
+	Draw
 };
 
 enum roundScore {
@@ -17,55 +23,92 @@ enum roundScore {
 	paper = 2,
 	scissors = 3,
 
-	Loss = 0,
-	Draw = 3,
-	Win = 6
+	loss = 0,
+	draw = 3,
+	win = 6
 };
 
-int checkResult(char opponent, char player)
+int checkResult(char opponent, char result)
 {
-	//convert to readable result
-	int opponentResult{};
-	int playerResult{};
+	int opponentHand{};
+	int playerHand{};
 	int matchResult{};
 
+	//convert opponent hand to readable result
 	switch (opponent)
 	{
 	case 'A':
-		opponentResult = Rock;
+		opponentHand = Rock;
 		break;
 	case 'B':
-		opponentResult = Paper;
+		opponentHand = Paper;
 		break;
 	case 'C':
-		opponentResult = Scissors;
+		opponentHand = Scissors;
 		break;
 	}
 
-	switch (player)
+	//convert result to readable result
+	switch (result)
 	{
 	case 'X':
-		playerResult = Rock;
+		matchResult = Loss;
 		break;
 	case 'Y':
-		playerResult = Paper;
+		matchResult = Draw;
 		break;
 	case 'Z':
-		playerResult = Scissors;
+		matchResult = Win;
 		break;
 	}
 
-	//compare
-	if (playerResult == opponentResult)
-		matchResult = (playerResult + 1) + Draw;
-	else if (playerResult == Rock && opponentResult == Scissors)
-		matchResult = rock + Win;
-	else if (playerResult == Paper && opponentResult == Rock)
-		matchResult = paper + Win;
-	else if (playerResult == Scissors && opponentResult == Paper)
-		matchResult = scissors + Win;
+	//determine players hand based on rules
+	if (matchResult == Loss)
+	{
+		switch (opponentHand)
+		{
+		case Rock:
+			playerHand = Scissors;
+			break;
+		case Paper:
+			playerHand = Rock;
+			break;
+		case Scissors:
+			playerHand = Paper;
+			break;
+		}
+	}
+	else if (matchResult == Win)
+	{
+		switch (opponentHand)
+		{
+		case Rock:
+			playerHand = Paper;
+			break;
+		case Paper:
+			playerHand = Scissors;
+			break;
+		case Scissors:
+			playerHand = Rock;
+			break;
+		}
+	}
+	else if (matchResult == Draw)
+	{
+		playerHand = opponentHand;
+	}
+
+	// define the score based
+	if (playerHand == opponentHand)
+		matchResult = (playerHand + 1) + draw;
+	else if (playerHand == Rock && opponentHand == Scissors)
+		matchResult = rock + win;
+	else if (playerHand == Paper && opponentHand == Rock)
+		matchResult = paper + win;
+	else if (playerHand == Scissors && opponentHand == Paper)
+		matchResult = scissors + win;
 	else
-		matchResult = (playerResult + 1) + Loss;
+		matchResult = (playerHand + 1) + loss;
 
 	return matchResult;
 }
