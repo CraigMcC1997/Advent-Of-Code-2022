@@ -1,116 +1,40 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cstdlib>
-#include <algorithm>
 
 using namespace std;
 
-enum opponentHand {
-	Rock,
-	Paper,
-	Scissors
-};
 
-enum gameResult {
-	Win,
-	Loss,
-	Draw
-};
-
-enum roundScore {
-	rock = 1,
-	paper = 2,
-	scissors = 3,
-
-	loss = 0,
-	draw = 3,
-	win = 6
-};
-
-int checkResult(char opponent, char result)
+int split_string(const string& s)
 {
-	int opponentHand{};
-	int playerHand{};
-	int matchResult{};
+	// Find the midpoint of the string
+	size_t mid = s.length() / 2;
 
-	//convert opponent hand to readable result
-	switch (opponent)
-	{
-	case 'A':
-		opponentHand = Rock;
-		break;
-	case 'B':
-		opponentHand = Paper;
-		break;
-	case 'C':
-		opponentHand = Scissors;
-		break;
-	}
+	// Get the first and second half of the string
+	std::string first_half = s.substr(0, mid);
+	std::string second_half = s.substr(mid);
 
-	//convert result to readable result
-	switch (result)
-	{
-	case 'X':
-		matchResult = Loss;
-		break;
-	case 'Y':
-		matchResult = Draw;
-		break;
-	case 'Z':
-		matchResult = Win;
-		break;
-	}
-
-	//determine players hand based on rules
-	if (matchResult == Loss)
-	{
-		switch (opponentHand)
-		{
-		case Rock:
-			playerHand = Scissors;
-			break;
-		case Paper:
-			playerHand = Rock;
-			break;
-		case Scissors:
-			playerHand = Paper;
-			break;
+	// Search for repeated characters
+	for (char c : first_half) {
+		if (second_half.find(c) != std::string::npos) {
+			// Found a repeated character, compute the score
+			if (c >= 'a' && c <= 'z') {
+				// Lowercase letter, score is 1 through 26
+				return c - 'a' + 1;
+			}
+			else if (c >= 'A' && c <= 'Z') {
+				// Uppercase letter, score is 27 through 52
+				return c - 'A' + 27;
+			}
+			else {
+				// Non-letter character, score is 0
+				return 0;
+			}
 		}
 	}
-	else if (matchResult == Win)
-	{
-		switch (opponentHand)
-		{
-		case Rock:
-			playerHand = Paper;
-			break;
-		case Paper:
-			playerHand = Scissors;
-			break;
-		case Scissors:
-			playerHand = Rock;
-			break;
-		}
-	}
-	else if (matchResult == Draw)
-	{
-		playerHand = opponentHand;
-	}
 
-	// define the score based
-	if (playerHand == opponentHand)
-		matchResult = (playerHand + 1) + draw;
-	else if (playerHand == Rock && opponentHand == Scissors)
-		matchResult = rock + win;
-	else if (playerHand == Paper && opponentHand == Rock)
-		matchResult = paper + win;
-	else if (playerHand == Scissors && opponentHand == Paper)
-		matchResult = scissors + win;
-	else
-		matchResult = (playerHand + 1) + loss;
-
-	return matchResult;
+	// No repeated characters found, score is 0
+	return 0;
 }
 
 int main()
@@ -129,14 +53,13 @@ int main()
 	// Read each line of the file
 	while (getline(input, line))
 	{
-		totalScore += checkResult(line[0], line[2]);
+		totalScore += split_string(line);
 	}
 
-	cout << "Score: " << totalScore << endl;
+	cout << "total Score: " << totalScore << endl;
 
-	// Close the file
+	// Close file
 	input.close();
 
-	// Return success
 	return 0;
 }
