@@ -26,7 +26,8 @@ void check_overlap(const string& first, const string& second, int& numOverlaps)
 	i3 = stoi(s3);
 	i4 = stoi(s4);
 
-	if (((i3 <= i1) && (i4 >= i2)) || ((i1 <= i3) && (i2 >= i4)))
+	//any overlap
+	if (i1 <= i4 && i3 <= i2)
 	{
 		numOverlaps++;
 	}
