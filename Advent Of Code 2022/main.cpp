@@ -4,44 +4,58 @@
 
 using namespace std;
 
+string elfGroup[3];
+long int totalScore = 0;
 
-int split_string(const string& s)
+void add_score(const char& c)
 {
-	// Find the midpoint of the string
-	size_t mid = s.length() / 2;
+	// Found a repeated character, compute the score
+	if (c >= 'a' && c <= 'z') {
+		// Lowercase letter, score is 1 through 26
+		totalScore += c - 'a' + 1;
+	}
+	else if (c >= 'A' && c <= 'Z') {
+		// Uppercase letter, score is 27 through 52
+		totalScore += c - 'A' + 27;
+	}
+}
 
-	// Get the first and second half of the string
-	std::string first_half = s.substr(0, mid);
-	std::string second_half = s.substr(mid);
+void find_letter()
+{
+	char commonLetter = '\0';
 
-	// Search for repeated characters
-	for (char c : first_half) {
-		if (second_half.find(c) != std::string::npos) {
-			// Found a repeated character, compute the score
-			if (c >= 'a' && c <= 'z') {
-				// Lowercase letter, score is 1 through 26
-				return c - 'a' + 1;
+	// Iterate over the characters in the first string
+	for (char c1 : elfGroup[0])
+	{
+		// Initialize a counter variable
+		int counter = 1;
+
+		// Iterate over the characters in the second and third strings
+		for (int i = 1; i < 3; i++) {
+			// Check if the current character is present in the current string
+			if (elfGroup[i].find(c1) != string::npos) {
+				// Increment the counter if the character is found
+				counter++;
 			}
-			else if (c >= 'A' && c <= 'Z') {
-				// Uppercase letter, score is 27 through 52
-				return c - 'A' + 27;
-			}
-			else {
-				// Non-letter character, score is 0
-				return 0;
-			}
+		}
+
+		// Check if the character was found in all three strings
+		if (counter == 3) {
+			// Set the common letter if it was found in all three strings
+			commonLetter = c1;
+			break;
 		}
 	}
 
-	// No repeated characters found, score is 0
-	return 0;
+	cout << "Common Letter: " << commonLetter << endl;
+	add_score(commonLetter);
 }
 
 int main()
 {
 	ifstream input("../input.txt");
 	string line;
-	int totalScore = 0;
+	int i = 0;
 
 	// Check if the file was successfully opened
 	if (!input.is_open())
@@ -50,13 +64,26 @@ int main()
 		return 1;
 	}
 
-	// Read each line of the file
+	// store the elfs in groups of three
 	while (getline(input, line))
 	{
-		totalScore += split_string(line);
+		//if group is full then check it for the "badge"
+		if (i == 3)
+		{
+			find_letter();
+			i = 0;
+		}
+
+		elfGroup[i] = line;
+		i++;
 	}
 
-	cout << "total Score: " << totalScore << endl;
+	// check if there are any lines left in the group
+	if (i > 0) {
+		find_letter();
+	}
+
+	cout << "Total Score: " << totalScore << endl;
 
 	// Close file
 	input.close();
