@@ -4,58 +4,41 @@
 
 using namespace std;
 
-string elfGroup[3];
-long int totalScore = 0;
-
-void add_score(const char& c)
-{
-	// Found a repeated character, compute the score
-	if (c >= 'a' && c <= 'z') {
-		// Lowercase letter, score is 1 through 26
-		totalScore += c - 'a' + 1;
-	}
-	else if (c >= 'A' && c <= 'Z') {
-		// Uppercase letter, score is 27 through 52
-		totalScore += c - 'A' + 27;
+void split_string(const string& input, string& first, string& second, const char c) {
+	size_t index = input.find(c);
+	if (index != string::npos) {
+		first = input.substr(0, index);
+		second = input.substr(index + 1);
 	}
 }
 
-void find_letter()
+void check_overlap(const string& first, const string& second, int& numOverlaps)
 {
-	char commonLetter = '\0';
+	string s1, s2, s3, s4;
+	int i1, i2, i3, i4;
+	char c = '-';
 
-	// Iterate over the characters in the first string
-	for (char c1 : elfGroup[0])
+	split_string(first, s1, s2, c);
+	split_string(second, s3, s4, c);
+
+	i1 = stoi(s1);
+	i2 = stoi(s2);
+	i3 = stoi(s3);
+	i4 = stoi(s4);
+
+	if (((i3 <= i1) && (i4 >= i2)) || ((i1 <= i3) && (i2 >= i4)))
 	{
-		// Initialize a counter variable
-		int counter = 1;
-
-		// Iterate over the characters in the second and third strings
-		for (int i = 1; i < 3; i++) {
-			// Check if the current character is present in the current string
-			if (elfGroup[i].find(c1) != string::npos) {
-				// Increment the counter if the character is found
-				counter++;
-			}
-		}
-
-		// Check if the character was found in all three strings
-		if (counter == 3) {
-			// Set the common letter if it was found in all three strings
-			commonLetter = c1;
-			break;
-		}
+		numOverlaps++;
 	}
-
-	cout << "Common Letter: " << commonLetter << endl;
-	add_score(commonLetter);
 }
 
 int main()
 {
 	ifstream input("../input.txt");
 	string line;
-	int i = 0;
+	int totalOverlaps = 0;
+	string s1, s2;
+	char c = ',';
 
 	// Check if the file was successfully opened
 	if (!input.is_open())
@@ -67,23 +50,11 @@ int main()
 	// store the elfs in groups of three
 	while (getline(input, line))
 	{
-		//if group is full then check it for the "badge"
-		if (i == 3)
-		{
-			find_letter();
-			i = 0;
-		}
-
-		elfGroup[i] = line;
-		i++;
+		split_string(line, s1, s2, c);
+		check_overlap(s1, s2, totalOverlaps);
 	}
 
-	// check if there are any lines left in the group
-	if (i > 0) {
-		find_letter();
-	}
-
-	cout << "Total Score: " << totalScore << endl;
+	cout << "Total Overlap: " << totalOverlaps << endl;
 
 	// Close file
 	input.close();
